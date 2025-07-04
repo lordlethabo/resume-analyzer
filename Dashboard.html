@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resume Analyzer Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-900">
+  <!-- Navigation -->
+  <nav class="bg-white shadow px-6 py-4 flex justify-between items-center">
+    <h1 class="text-xl font-bold">Resume<span class="text-green-600">Analyzer</span> Dashboard</h1>
+    <a href="index.html" class="text-sm text-green-600 hover:underline">Upload Another Resume</a>
+  </nav>
+
+  <!-- Main Dashboard -->
+  <main class="max-w-5xl mx-auto mt-10 px-6">
+    <section class="mb-10">
+      <h2 class="text-2xl font-semibold mb-4">Skill Summary</h2>
+      <div class="bg-white shadow rounded-lg p-6">
+        <ul id="skillsList" class="list-disc pl-5 text-gray-700"></ul>
+      </div>
+    </section>
+
+    <section class="mb-10">
+      <h2 class="text-2xl font-semibold mb-4">Learning Recommendations</h2>
+      <div class="bg-white shadow rounded-lg p-6">
+        <ul id="suggestionsList" class="list-disc pl-5 text-gray-700"></ul>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="text-2xl font-semibold mb-4">Skill Match Chart</h2>
+      <div class="bg-white shadow rounded-lg p-6">
+        <canvas id="skillsChart"></canvas>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Simulated data (you can replace this with Firebase fetch logic)
+    const skills = ["python", "firebase", "sql"];
+    const suggestions = ["Learn cloud fundamentals", "Practice data structures"];
+
+    // Display Skills
+    const skillsList = document.getElementById("skillsList");
+    skills.forEach(skill => {
+      const li = document.createElement("li");
+      li.textContent = skill;
+      skillsList.appendChild(li);
+    });
+
+    // Display Suggestions
+    const suggestionsList = document.getElementById("suggestionsList");
+    suggestions.forEach(s => {
+      const li = document.createElement("li");
+      li.textContent = s;
+      suggestionsList.appendChild(li);
+    });
+
+    // Chart
+    const ctx = document.getElementById("skillsChart").getContext("2d");
+    new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: skills,
+        datasets: [{
+          label: "Skills Found",
+          data: skills.map(() => 1),
+          backgroundColor: "#10B981"
+        }]
+      },
+      options: {
+        scales: {
+          y: { beginAtZero: true, ticks: { precision: 0 } }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
