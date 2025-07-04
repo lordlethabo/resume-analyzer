@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Resume Analyzer – Smart Skill Matching AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+  <!-- pdf.js library for client-side PDF parsing -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.15.349/pdf.min.js"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .dark-mode {
+      background-color: #1a202c;
+      color: #f7fafc;
+    }
+  </style>
+</head>
+<body class="bg-white text-gray-900 transition-colors duration-300" id="mainBody">
+  <!-- NAVIGATION BAR -->
+  <header class="flex justify-between items-center px-4 sm:px-6 lg:px-8 py-4 shadow-md">
+    <div class="flex items-center gap-3">
+      <img src="#" alt="Resume Analyzer Logo" class="h-10 w-10 object-contain" id="logoImage" />
+      <div class="text-xl sm:text-2xl font-bold">Resume<span class="text-green-600">Analyzer</span></div>
+    </div>
+    <div class="flex gap-3 sm:gap-4 items-center">
+      <button onclick="toggleDarkMode()" class="text-sm px-3 py-1 border rounded-lg">🌓</button>
+      <a href="#" class="text-sm sm:text-base text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">Login</a>
+      <a href="#" class="text-sm sm:text-base bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">Try Now</a>
+    </div>
+  </header>
+
+  <!-- HERO SECTION -->
+  <section class="min-h-screen flex flex-col justify-center items-center max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8 text-center bg-gradient-to-b from-white to-green-50 dark:from-gray-900 dark:to-gray-800">
+    <div data-aos="fade-up">
+      <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">Resume Analyzer</h1>
+      <p class="text-base md:text-lg text-gray-600 dark:text-gray-300 mb-8">
+        Upload your resume. Get job matches. Learn what you’re missing.
+      </p>
+      <label class="inline-block bg-white dark:bg-gray-700 shadow-md rounded-full px-6 py-3 text-green-700 dark:text-green-400 font-semibold hover:bg-green-100 dark:hover:bg-gray-600 transition cursor-pointer">
+        <input type="file" class="hidden" id="resumeUpload" accept=".pdf,.doc,.docx,.txt" onchange="handleResumeUpload(event)" />
+        Upload Resume
+      </label>
+      <p id="uploadStatus" class="mt-4 text-sm"></p>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="py-16 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-900">
+    <div class="max-w-6xl mx-auto grid gap-12 md:grid-cols-2">
+      <div data-aos="fade-right">
+        <h2 class="text-2xl font-bold mb-4">📄 Resume Parsing</h2>
+        <p class="text-gray-600 dark:text-gray-300">Extract structured content from your resume using cloud OCR or NLP tools.</p>
+      </div>
+      <div data-aos="fade-left">
+        <h2 class="text-2xl font-bold mb-4">🧠 Skill Recognition</h2>
+        <p class="text-gray-600 dark:text-gray-300">Identify key skills and experience using AI-based pattern matching.</p>
+      </div>
+      <div data-aos="fade-right">
+        <h2 class="text-2xl font-bold mb-4">📊 Job Matching</h2>
+        <p class="text-gray-600 dark:text-gray-300">Match your skills to job roles with smart recommendations.</p>
+      </div>
+      <div data-aos="fade-left">
+        <h2 class="text-2xl font-bold mb-4">🎓 Learning Gaps</h2>
+        <p class="text-gray-600 dark:text-gray-300">Get personalized learning suggestions to close your gaps.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="bg-gray-100 dark:bg-gray-800 text-center text-sm text-gray-500 dark:text-gray-400 py-6 px-4">
+    &copy; 2025 Resume Analyzer. Built with ❤️ using AI and Cloud.
+  </footer>
+
+  <!-- FIREBASE & PDF.JS SCRIPT -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBpA48YQM0309DEmbeU0srayNkxtGpr0vc",
+      authDomain: "resume-analyzer-5b815.firebaseapp.com",
+      projectId: "resume-analyzer-5b815",
+      storageBucket: "resume-analyzer-5b815.appspot.com",
+      messagingSenderId: "400903001689",
+      appId: "1:400903001689:web:e13797cd071705f5d68348"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const storage = getStorage(app);
+
+    // pdf.js needs a global variable
+    window.pdfjsLib = window['pdfjs-dist/build/pdf'];
+
+    // Extract text from PDF file using pdf.js
+    async function extractTextFromPDF(file) {
+      const arrayBuffer = await file.arrayBuffer();
+      const typedArray = new Uint8Array(arrayBuffer);
+      const pdf = await pdfjsLib.getDocument(typedArray).promise;
+
+      let fullText = '';
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items.map(item => item.str).join(' ');
+        fullText += pageText + '\n';
+      }
+      return fullText;
+    }
+
+    async function analyzeResumeText(text) {
+      const knownSkills = ['python', 'javascript', 'firebase', 'aws', 'devops', 'linux', 'sql', 'html', 'css', 'node.js'];
+      const lowerText = text.toLowerCase();
+      const foundSkills = knownSkills.filter(skill => lowerText.includes(skill));
+      const suggestions = foundSkills.length < 5
+        ? ['Learn cloud fundamentals', 'Practice data structures', 'Take DevOps or Git course']
+        : ['You’re ready! Try applying to entry-level cloud roles.'];
+      return { foundSkills, suggestions };
+    }
+
+    window.handleResumeUpload = async function(event) {
+      const file = event.target.files[0];
+      const status = document.getElementById('uploadStatus');
+      if (!file) return;
+
+      status.textContent = `Uploading: ${file.name}...`;
+
+      const fileRef = ref(storage, 'resumes/' + file.name);
+      try {
+        await uploadBytes(fileRef, file);
+        const downloadURL = await getDownloadURL(fileRef);
+        status.innerHTML = `✅ Uploaded! <a href="${downloadURL}" target="_blank" class="text-green-600 underline">View Resume</a>`;
+
+        let extractedText = '';
+        if (file.type === 'application/pdf') {
+          extractedText = await extractTextFromPDF(file);
+        } else if (file.type === 'text/plain') {
+          extractedText = await file.text();
+        } else {
+          status.innerHTML += `<br><em>(Text extraction only supports PDF and TXT files currently)</em>`;
+        }
+
+        if (extractedText) {
+          const result = await analyzeResumeText(extractedText);
+          status.innerHTML += `<br><br><strong>Skills Found:</strong> ${result.foundSkills.join(', ') || 'None'}`;
+          status.innerHTML += `<br><strong>Suggestions:</strong> ${result.suggestions.join(', ')}`;
+        }
+      } catch (error) {
+        status.textContent = `❌ Upload failed: ${error.message}`;
+      }
+    }
+  </script>
+
+  <script>
+    AOS.init();
+
+    function toggleDarkMode() {
+      document.getElementById('mainBody').classList.toggle('dark');
+      document.getElementById('mainBody').classList.toggle('dark-mode');
+    }
+  </script>
+</body>
+</html>
