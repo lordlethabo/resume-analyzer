@@ -1,8 +1,6 @@
 # 🧠 Resume Analyzer – AI-Powered Skill Matching Tool
 
-Resume Analyzer is a smart, cloud-powered web app that helps users instantly analyze their resumes, identify key tech skills, and get tailored recommendations to close skill gaps — all in one click.
-
-![screenshot](https://your-screenshot-or-cover-image-link) <!-- Optional screenshot here -->
+**Resume Analyzer** is a smart, cloud-powered web app that allows users to upload resumes (PDF or TXT), instantly analyze the content using AI, extract key skills, and receive personalized recommendations to improve their job-readiness.
 
 ---
 
@@ -13,29 +11,32 @@ Resume Analyzer is a smart, cloud-powered web app that helps users instantly ana
 
 ## ✨ Features
 
-- 🔍 **Client-side PDF/TXT parsing** using `pdf.js`
-- 🧠 **AI-powered skill extraction** from resume content
-- ☁️ **Firebase integration** (storage, hosting)
-- 🌑 **Dark mode** + responsive design (TailwindCSS)
-- 🎯 **Admin toggle** for switching to **AWS Textract OCR**
-- 📊 (Coming soon) Skill gap dashboard & job matching insights
+- 🔍 **Client-side PDF parsing** using `pdf.js`
+- 🧠 **AI-powered skill extraction** and keyword matching
+- ☁️ **Firebase Integration** (Storage + Hosting)
+- 🌙 **Dark mode toggle** with smooth transitions
+- 🎯 **Admin-only AWS Textract toggle** for OCR parsing (via Lambda)
+- 📊 (Coming soon) Skill gap dashboard with role-based recommendations
 
 ---
 
 ## 🧑‍💻 Tech Stack
 
-| Area         | Stack/Service                         |
+| Area         | Technology / Service                  |
 |--------------|----------------------------------------|
 | Frontend     | HTML, TailwindCSS, JavaScript (ES6)    |
-| Hosting      | Firebase Hosting                       |
+| OCR Parsing  | pdf.js (default), AWS Textract (optional) |
 | File Storage | Firebase Storage                       |
-| OCR Engine   | pdf.js (client-side), AWS Textract (optional) |
-| Backend (OCR) | AWS Lambda + S3 + Textract             |
-| CI/CD (optional) | GitHub + Firebase GitHub Integration |
+| Hosting      | Firebase Hosting                       |
+| Backend (OCR) | AWS Lambda + S3 + IAM                 |
+| CI/CD        | GitHub + Firebase CLI / GitHub Actions |
 
 ---
 
-## 🛠 Setup Instructions
+## 🛠 How to Set Up Locally
 
-### 1. Clone the Repo
+### 1. Clone the Repository
 
+```bash
+git clone https://github.com/lordlethabo/resume-analyzer.git
+cd resume-analyzer
